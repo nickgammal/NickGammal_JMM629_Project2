@@ -1,0 +1,46 @@
+.verticalLine {
+    border-left: solid #000000;
+    left: 60%;
+    top: 30px;
+    position: relative;
+    height: 600px;
+    float: left;
+  }
+
+.words {
+    left: 65%;
+    top: -430px;
+    position: relative;
+    height: 1000px;
+    width: 30%;
+    float: left;
+  }
+
+.subtitle {
+    left: 65%;
+    top: -1480px;
+    position: relative;
+    width: 30%;
+    font-weight: 800;
+    font-size: large;
+  }
+
+.refresh-button {
+    left: 65%;
+    top: -1050px;
+    position: relative;
+  }
+
+.contextMenu {
+    stroke: #010101;
+    fill: #ffffff;
+}
+
+.menuEntry {
+    cursor: pointer;
+}
+
+.menuEntry text {
+    font-size: 12px;
+    stroke: #000000;
+}

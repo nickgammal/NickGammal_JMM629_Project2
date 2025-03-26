@@ -1,0 +1,215 @@
+---
+title: "Untitled"
+author: "Nick Gammal"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r message=FALSE, warning=FALSE}
+data <- read_delim("data/Occurrence.csv", delim = "\t")
+```
+
+```{r}
+filtered <- data %>% 
+  filter(
+    kingdom != "Bacteria",
+    class != "Aves", 
+    !grepl("incertae sedis", class), 
+    !grepl("unassigned", class)
+  ) %>% 
+  group_by(kingdom, class) %>%
+  mutate(
+    individualCount = replace_na(individualCount, 1),
+    individualCount = case_when(
+      kingdom == "Chromista" ~ individualCount * 1000,
+      class == "Copepoda" ~ individualCount * 1000,
+      phylum == "Bacillariophyta" ~ individualCount * 1000,
+      TRUE ~ individualCount
+    ),
+    n = sum(individualCount)
+  ) %>%
+  select(kingdom, phylum, class, n) %>%
+  unique()
+
+filtered <- filtered %>%
+  filter(n > 20) %>%
+  na.omit()
+
+filtered
+```
+
+
+```{r}
+filtered <- filtered %>%
+  mutate(
+    trophic = case_when(
+      kingdom == "Chromista" ~ 0,
+      kingdom == "Plantae" ~ 0,
+      class == "Elasmobranchii" ~ 3,
+      class == "Teleostei" ~ 2,
+      class == "Mammalia" ~ 3,
+      class == "Cephalopoda" ~ 3,
+      class == "Malacostraca" ~ 2,
+      phylum == "Cnidaria" ~ 2,
+      phylum == "Chordata" ~ 2,
+      phylum == "Echinodermata" ~ 2,
+      TRUE ~ 1,
+    )
+  ) %>%
+  distinct(
+    class, n, trophic
+  )
+```
+
+```{r}
+write.csv(filtered, "counts.csv")
+```
+
+
+```{r}
+filtered$class
+```
+
+
+
+
+```{r}
+a <- rbind(
+  c("Branchiopoda", "Bacillariophyceae"),
+  c("Branchiopoda", "Dinophyceae"),
+  c("Branchiopoda", "Globothalamea"),
+  c("Branchiopoda", "Copepoda"),
+  
+  c("Thecostraca", "Bacillariophyceae"),
+  c("Thecostraca", "Dinophyceae"),
+  c("Thecostraca", "Globothalamea"),
+  c("Thecostraca", "Copepoda"),
+  
+  c("Bivalvia", "Bacillariophyceae"),
+  c("Bivalvia", "Dinophyceae"),
+  c("Bivalvia", "Globothalamea"),
+  c("Bivalvia", "Copepoda"),
+  
+  c("Ostracoda", "Bacillariophyceae"),
+  c("Ostracoda", "Dinophyceae"),
+  c("Ostracoda", "Globothalamea"),
+  c("Ostracoda", "Copepoda"),
+  
+  c("Holothuroidea", "Bacillariophyceae"),
+  c("Holothuroidea", "Dinophyceae"),
+  c("Holothuroidea", "Globothalamea"),
+  c("Holothuroidea", "Copepoda"),
+  
+  c("Thaliacea", "Bacillariophyceae"),
+  c("Thaliacea", "Dinophyceae"),
+  c("Thaliacea", "Globothalamea"),
+  c("Thaliacea", "Copepoda"),
+  
+  c("Tentaculata", "Bacillariophyceae"),
+  c("Tentaculata", "Dinophyceae"),
+  c("Tentaculata", "Globothalamea"),
+  c("Tentaculata", "Copepoda"),
+  
+  c("Ascidiacea", "Bacillariophyceae"),
+  c("Ascidiacea", "Dinophyceae"),
+  c("Ascidiacea", "Globothalamea"),
+  c("Ascidiacea", "Copepoda"),
+  
+  c("Copepoda", "Bacillariophyceae"),
+  c("Copepoda", "Dinophyceae"),
+  c("Copepoda", "Globothalamea"),
+  
+  c("Asteroidea", "Bivalvia"),
+  c("Asteroidea", "Gastropoda"),
+  
+  c("Holocephali", "Gastropoda"),
+  c("Holocephali", "Bivalvia"),
+  c("Holocephali", "Malacostraca"),
+  
+  c("Ophiuroidea", "Polychaeta"),
+  c("Ophiuroidea", "Phaeophyceae"),
+  c("Ophiuroidea", "Chromadorea"),
+  c("Ophiuroidea", "Enoplea"),
+  
+  c("Echinoidea", "Phaeophyceae"),
+  c("Echinoidea", "Magnoliopsida"),
+  
+  c("Scyphozoa", "Teleostei"),
+  
+  c("Myxini", "Polychaeta"),
+  c("Myxini", "Gastropoda"),
+  c("Myxini", "Chromadorea"),
+  c("Myxini", "Enoplea"),
+  
+  c("Cephalopoda", "Teleostei"),
+  c("Cephalopoda", "Bivalvia"),
+  c("Cephalopoda", "Gastropoda"),
+  c("Cephalopoda", "Malacostraca"),
+  
+  c("Polyplacophora", "Phaeophyceae"),
+  c("Polyplacophora", "Magnoliopsida"),
+  
+  c("Elasmobranchii", "Teleostei"),
+  c("Elasmobranchii", "Mammalia"),
+  c("Elasmobranchii", "Malacostraca"),
+  c("Elasmobranchii", "Cephalopoda"),
+  
+  c("Malacostraca", "Phaeophyceae"),
+  c("Malacostraca", "Bivalvia"),
+  c("Malacostraca", "Magnoliopsida"),
+  c("Malacostraca", "Thecostraca"),
+  c("Malacostraca", "Teleostei"),
+  
+  c("Teleostei", "Gastropoda"),
+  c("Teleostei", "Malacostraca"),
+  c("Teleostei", "Cephalopoda"),
+  c("Teleostei", "Polychaeta"),
+  c("Teleostei", "Bivalvia"),
+  c("Teleostei", "Magnoliopsida"),
+  c("Teleostei", "Thecostraca"),
+  c("Teleostei", "Copepoda"),
+  c("Teleostei", "Bacillariophyceae"),
+  c("Teleostei", "Holocephali"),
+  c("Teleostei", "Holothuroidea"),
+  c("Teleostei", "Cephalopoda"),
+  c("Teleostei", "Chromadorea"),
+  c("Teleostei", "Enoplea"),
+  c("Teleostei", "Branchiopoda"),
+  c("Teleostei", "Globothalamea"),
+  c("Teleostei", "Dinophyceae"),
+  
+  c("Mammalia", "Malacostraca"),
+  c("Mammalia", "Cephalopoda"),
+  c("Mammalia", "Gastropoda"),
+  c("Mammalia", "Bivalvia"),
+  c("Mammalia", "Teleostei"),
+  c("Mammalia", "Echinoidea"),
+  c("Mammalia", "Holothuroidea"),
+  c("Mammalia", "Elasmobranchii"),
+  
+  c("Gastropoda", "Magnoliopsida"),
+  c("Gastropoda", "Polyplacophora"),
+  c("Gastropoda", "Branchiopoda"),
+  c("Gastropoda", "Bivalvia"),
+  c("Gastropoda", "Thecostraca"),
+  c("Gastropoda", "Phaeophyceae")
+)
+
+a <- data.frame(a)
+colnames(a) <- c("source", "target")
+a
+```
+
+```{r}
+write.csv(a, "edges.csv")
+```
+
