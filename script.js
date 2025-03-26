@@ -97,8 +97,8 @@ const node = svg.append("g")
         simulation.restart();
 
         // remove the physical node and link elements
-        svg.removeChild(d.target);
-        console.log(d.target);
+        svg.node().removeChild(event.target);
+        console.log(event.target);
 
 /*
             I can remove the nodes and links from the data dictionary, but I can't figure 
